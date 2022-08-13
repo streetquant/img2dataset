@@ -32,8 +32,8 @@ testformat = [
 @pytest.mark.parametrize("encode_quality, encode_format", testformat)
 def test_resizer(image_size, resize_mode, resize_only_if_bigger, skip_reencode, encode_quality, encode_format):
     current_folder = os.path.dirname(__file__)
-    test_folder = current_folder + "/" + "resize_test_image"
-    image_paths = glob.glob(test_folder + "/*")
+    test_folder = f"{current_folder}/resize_test_image"
+    image_paths = glob.glob(f"{test_folder}/*")
     resizer = Resizer(
         image_size,
         resize_mode,
@@ -64,8 +64,8 @@ def test_resizer(image_size, resize_mode, resize_only_if_bigger, skip_reencode, 
 
 def test_resizer_filter():
     current_folder = os.path.dirname(__file__)
-    test_folder = current_folder + "/" + "resize_test_image"
-    image_paths = glob.glob(test_folder + "/*")
+    test_folder = f"{current_folder}/resize_test_image"
+    image_paths = glob.glob(f"{test_folder}/*")
     resizer = Resizer(
         image_size=256, resize_mode="no", resize_only_if_bigger=True, min_image_size=200, max_aspect_ratio=1.5
     )

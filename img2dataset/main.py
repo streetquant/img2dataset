@@ -62,16 +62,14 @@ def download(
 
     def make_path_absolute(path):
         fs, p = fsspec.core.url_to_fs(path)
-        if fs.protocol == "file":
-            return os.path.abspath(p)
-        return path
+        return os.path.abspath(p) if fs.protocol == "file" else path
 
     output_folder = make_path_absolute(output_folder)
     url_list = make_path_absolute(url_list)
 
     logger_process = LoggerProcess(output_folder, enable_wandb, wandb_project, config_parameters)
 
-    tmp_path = output_folder + "/_tmp"
+    tmp_path = f"{output_folder}/_tmp"
     fs, tmp_dir = fsspec.core.url_to_fs(tmp_path)
     if not fs.exists(tmp_dir):
         fs.mkdir(tmp_dir)
@@ -95,7 +93,11 @@ def download(
         done_shards = set()
     else:
         if incremental_mode == "incremental":
-            done_shards = set(int(x.split("/")[-1].split("_")[0]) for x in fs.glob(output_path + "/*.json"))
+            done_shards = {
+                int(x.split("/")[-1].split("_")[0])
+                for x in fs.glob(f"{output_path}/*.json")
+            }
+
         elif incremental_mode == "overwrite":
             fs.rm(output_path, recursive=True)
             fs.mkdir(output_path)
@@ -132,11 +134,10 @@ def download(
 
     if encode_format not in ["jpg", "png", "webp"]:
         raise ValueError(f"Invalid encode format {encode_format}")
-    if encode_format == "png":
-        if encode_quality < 0 or encode_quality > 9:
-            raise ValueError(
-                f"For png, encode quality represents compression which must be between 0 and 9, got {encode_quality}"
-            )
+    if encode_format == "png" and (encode_quality < 0 or encode_quality > 9):
+        raise ValueError(
+            f"For png, encode quality represents compression which must be between 0 and 9, got {encode_quality}"
+        )
 
     resizer = Resizer(
         image_size=image_size,

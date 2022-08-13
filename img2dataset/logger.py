@@ -233,17 +233,16 @@ class LoggerProcess(multiprocessing.context.SpawnProcess):
 
             try:
                 # read stats files
-                stats_files = fs.glob(output_path + "/*.json")
+                stats_files = fs.glob(f"{output_path}/*.json")
 
                 # filter out files that have an id smaller that are already done
                 stats_files = [f for f in stats_files if int(f.split("/")[-1].split("_")[0]) not in self.done_shards]
 
                 # get new stats files
                 new_stats_files = set(stats_files) - self.stats_files
-                if len(new_stats_files) == 0:
-                    if last_one:
-                        self.finish()
-                        return
+                if len(new_stats_files) == 0 and last_one:
+                    self.finish()
+                    return
 
                 # read new stats files
                 for stats_file in new_stats_files:

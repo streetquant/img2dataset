@@ -47,10 +47,9 @@ def download_image_with_retry(row, timeout, retries):
 def compute_key(key, shard_id, oom_sample_per_shard, oom_shard_count):
     true_key = (10**oom_sample_per_shard) * shard_id + key
     key_format = oom_sample_per_shard + oom_shard_count
-    str_key = "{true_key:0{key_format}d}".format(  # pylint: disable=consider-using-f-string
+    return "{true_key:0{key_format}d}".format(  # pylint: disable=consider-using-f-string
         key_format=key_format, true_key=true_key
     )
-    return str_key
 
 
 class Downloader:

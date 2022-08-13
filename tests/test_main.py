@@ -157,7 +157,7 @@ def test_download_input_format(input_format, output_format, tmp_path):
         assert len(pd.read_parquet(image_folder_name + "/00000.parquet").index) == expected_file_count
     elif output_format == "dummy":
         l = [x for x in glob.glob(image_folder_name + "/*") if not x.endswith(".json")]
-        assert len(l) == 0
+        assert not l
     elif output_format == "tfrecord":
         l = glob.glob(image_folder_name + "/*.tfrecord")
         assert len(l) == 1
@@ -187,7 +187,7 @@ def test_download_multiple_input_files(input_format, output_format, tmp_path):
     prefix = input_format + "_" + output_format + "_"
     test_folder = str(tmp_path)
 
-    subfolder = test_folder + "/" + prefix + "input_folder"
+    subfolder = f"{test_folder}/" + prefix + "input_folder"
     if not os.path.exists(subfolder):
         os.mkdir(subfolder)
     url_list_names = [os.path.join(subfolder, prefix + "url_list1"), os.path.join(subfolder, prefix + "url_list2")]
@@ -243,7 +243,7 @@ def test_captions_saving(save_caption, output_format, tmp_path):
     test_list = setup_fixtures()
 
     input_format = "parquet"
-    prefix = str(save_caption) + "_" + input_format + "_" + output_format + "_"
+    prefix = f"{str(save_caption)}_{input_format}_" + output_format + "_"
     url_list_name = os.path.join(test_folder, prefix + "url_list")
     image_folder_name = os.path.join(test_folder, prefix + "images")
     url_list_name = generate_input_file("parquet", url_list_name, test_list)
@@ -395,7 +395,7 @@ def test_benchmark(output_format, tmp_path):
 
     took = time.time() - t
 
-    print("Took " + str(took) + "s")
+    print(f"Took {str(took)}s")
 
     if took > 100:
-        raise Exception("Very slow, took " + str(took))
+        raise Exception(f"Very slow, took {str(took)}")
