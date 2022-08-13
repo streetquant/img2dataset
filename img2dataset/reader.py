@@ -107,7 +107,7 @@ class Reader:
             for shard_id in range(number_shards)
             if start_shard_id + shard_id not in self.done_shards
         ]
-        if len(shards_to_write) == 0:
+        if not shards_to_write:
             return [], number_shards
 
         def write_shard(t):
@@ -162,18 +162,18 @@ class Reader:
         """
         start_shard_id = 0
         for i, input_file in enumerate(self.input_files):
-            print("Sharding file number " + str(i + 1) + " of " + str(len(self.input_files)) + " called " + input_file)
+            print(
+                f"Sharding file number {str(i + 1)} of {len(self.input_files)} called "
+                + input_file
+            )
+
 
             shards, number_shards = self._save_to_arrow(input_file, start_shard_id)
-            print("File sharded in " + str(len(shards)) + " shards")
+            print(f"File sharded in {len(shards)} shards")
             print(
                 "Downloading starting now, check your bandwidth speed (with bwm-ng)"
                 "your cpu (with htop), and your disk usage (with iotop)!"
             )
 
-            for shard_id, arrow_file in shards:
-                yield (
-                    shard_id,
-                    arrow_file,
-                )
+            yield from shards
             start_shard_id += number_shards

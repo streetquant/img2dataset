@@ -86,20 +86,21 @@ def check_one_image_size(img, img_unresized, image_size, resize_mode, resize_onl
     width_unresized = img_unresized.shape[1]
     height_unresized = img_unresized.shape[0]
     resized = True
-    if resize_only_if_bigger:
-        if (
+    if resize_only_if_bigger and (
+        (
             max(width_unresized, height_unresized) <= image_size
             and resize_mode == "border"
             or min(width_unresized, height_unresized) <= image_size
             and resize_mode in ["keep_ratio", "center_crop"]
-        ):
-            if width_unresized != width or height_unresized != height:
-                raise Exception(
-                    f"Image size is not the same as the original one in resize only if bigger mode,"
-                    f"expected={width_unresized}, {height_unresized} found={width}, {height}"
-                )
-            else:
-                resized = False
+        )
+    ):
+        if width_unresized != width or height_unresized != height:
+            raise Exception(
+                f"Image size is not the same as the original one in resize only if bigger mode,"
+                f"expected={width_unresized}, {height_unresized} found={width}, {height}"
+            )
+        else:
+            resized = False
 
     if not resized:
         return
@@ -109,7 +110,7 @@ def check_one_image_size(img, img_unresized, image_size, resize_mode, resize_onl
             raise Exception(f"Image size is not 256x256 in border mode found={width}x{height}")
     elif resize_mode == "keep_ratio":
         ratio = float(image_size) / min(width_unresized, height_unresized)
-        new_size = tuple([round(x * ratio) for x in [width_unresized, height_unresized]])
+        new_size = tuple(round(x * ratio) for x in [width_unresized, height_unresized])
         if new_size != (width, height):
             raise Exception(
                 f"Image size is not of the right size in keep ratio mode"

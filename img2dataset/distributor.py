@@ -65,10 +65,11 @@ def pyspark_distributor(
         print("No pyspark session found, creating a new one!")
         spark = (
             SparkSession.builder.config("spark.driver.memory", "16G")
-            .master("local[" + str(processes_count) + "]")
+            .master(f"local[{str(processes_count)}]")
             .appName("spark-stats")
             .getOrCreate()
         )
+
 
     def batcher(iterable, batch_size):
         iterator = iter(iterable)

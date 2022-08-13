@@ -84,7 +84,7 @@ class ParquetSampleWriter:
             sample = {"key": key, self.encode_format: None}
             if self.save_caption:
                 sample["txt"] = None
-        sample.update(meta)
+        sample |= meta
         self.buffered_parquet_writer.write(sample)
 
     def close(self):
@@ -112,7 +112,10 @@ class WebDatasetSampleWriter:
         self.tar_fd = fs.open(f"{output_path}/{shard_name}.tar", "wb")
         self.tarwriter = wds.TarWriter(self.tar_fd)
         self.save_caption = save_caption
-        self.buffered_parquet_writer = BufferedParquetWriter(output_folder + "/" + shard_name + ".parquet", schema, 100)
+        self.buffered_parquet_writer = BufferedParquetWriter(
+            f"{output_folder}/{shard_name}.parquet", schema, 100
+        )
+
         self.encode_format = encode_format
 
     def write(self, img_str, key, caption, meta):
@@ -179,7 +182,10 @@ class TFRecordSampleWriter:
         self.shard_id = shard_id
         self.tf_writer = TFRecordWriter(f"{output_folder}/{shard_name}.tfrecord")
         self.save_caption = save_caption
-        self.buffered_parquet_writer = BufferedParquetWriter(output_folder + "/" + shard_name + ".parquet", schema, 100)
+        self.buffered_parquet_writer = BufferedParquetWriter(
+            f"{output_folder}/{shard_name}.parquet", schema, 100
+        )
+
         self.encode_format = encode_format
 
     def write(self, img_str, key, caption, meta):
@@ -248,7 +254,10 @@ class FilesSampleWriter:
         if not self.fs.exists(self.subfolder):
             self.fs.mkdir(self.subfolder)
         self.save_caption = save_caption
-        self.buffered_parquet_writer = BufferedParquetWriter(output_folder + "/" + shard_name + ".parquet", schema, 100)
+        self.buffered_parquet_writer = BufferedParquetWriter(
+            f"{output_folder}/{shard_name}.parquet", schema, 100
+        )
+
         self.encode_format = encode_format
 
     def write(self, img_str, key, caption, meta):
@@ -261,7 +270,7 @@ class FilesSampleWriter:
                 caption = str(caption) if caption is not None else ""
                 caption_filename = f"{self.subfolder}/{key}.txt"
                 with self.fs.open(caption_filename, "w") as f:
-                    f.write(str(caption))
+                    f.write(caption)
 
             # some meta data may not be JSON serializable
             for k, v in meta.items():

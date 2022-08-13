@@ -19,7 +19,7 @@ def test_writer(writer_type, tmp_path):
     current_folder = os.path.dirname(__file__)
     test_folder = str(tmp_path)
     input_folder = current_folder + "/" + "resize_test_image"
-    output_folder = test_folder + "/" + "test_write"
+    output_folder = f"{test_folder}/test_write"
     os.mkdir(output_folder)
     image_paths = glob.glob(input_folder + "/*")
     schema = pa.schema(
@@ -34,17 +34,17 @@ def test_writer(writer_type, tmp_path):
             pa.field("original_height", pa.int32()),
         ]
     )
-    if writer_type == "files":
+    if writer_type == "dummy":
+        writer_class = DummySampleWriter
+    elif writer_type == "files":
         writer_class = FilesSampleWriter
-    elif writer_type == "webdataset":
-        writer_class = WebDatasetSampleWriter
     elif writer_type == "parquet":
         writer_class = ParquetSampleWriter
-    elif writer_type == "dummy":
-        writer_class = DummySampleWriter
     elif writer_type == "tfrecord":
         writer_class = TFRecordSampleWriter
 
+    elif writer_type == "webdataset":
+        writer_class = WebDatasetSampleWriter
     writer = writer_class(0, output_folder, True, 5, schema, "jpg")
 
     for i, image_path in enumerate(image_paths):
